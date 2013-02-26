@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<task>
+    <process-list>
+        <general-context-var value="myValue" name="myVar"/>
+        <iterator value-to="3" value-from="1" context-name="capitulo"/>
+        <http-filter tag="myTag" name="myName" input="myInput" id="myId" find-mode="ALL" class="myClass"/>
+        <logger message="myMessage"/>
+        <http-getter url="myUrl" throw-exception="true"/>
+        <logger/>
+        <string-matcher search-group="0" search="mySearch" replace-payload="false" input="myInput" find-name="FIRST"/>
+        <image save-to="image.jpg" retries-on-fail="3" location="www.somesite.com/image.jpg"/>
+    </process-list>
+</task>

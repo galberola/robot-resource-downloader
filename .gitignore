@@ -1,6 +1,11 @@
-*.class
-
-# Package Files #
-*.jar
-*.war
-*.ear
+.classpath
+.settings
+.project
+.jruby
+*.iml
+*.ipr
+*.iws
+target
+bin/
+.DS_Store
+.idea

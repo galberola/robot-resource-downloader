@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="general-context-var" type="generalContextVarProcess"/>
+
+  <xs:element name="http-filter" type="httpFilterProcess"/>
+
+  <xs:element name="http-getter" type="httpGetterProcess"/>
+
+  <xs:element name="image" type="imageProcess"/>
+
+  <xs:element name="iterator" type="iteratorProcess"/>
+
+  <xs:element name="logger" type="loggerProcess"/>
+
+  <xs:element name="string-matcher" type="stringMatcherProcess"/>
+
+  <xs:element name="task" type="task"/>
+
+  <xs:complexType name="task">
+    <xs:sequence>
+      <xs:element name="process-list" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element ref="general-context-var"/>
+              <xs:element ref="iterator"/>
+              <xs:element ref="http-filter"/>
+              <xs:element ref="http-getter"/>
+              <xs:element ref="logger"/>
+              <xs:element ref="string-matcher"/>
+              <xs:element ref="image"/>
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="generalContextVarProcess">
+    <xs:complexContent>
+      <xs:extension base="process">
+        <xs:sequence/>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="value" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="process" abstract="true">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="iteratorProcess">
+    <xs:complexContent>
+      <xs:extension base="process">
+        <xs:sequence/>
+        <xs:attribute name="context-name" type="xs:string"/>
+        <xs:attribute name="value-from" type="xs:int" use="required"/>
+        <xs:attribute name="value-to" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="httpFilterProcess">
+    <xs:complexContent>
+      <xs:extension base="process">
+        <xs:sequence/>
+        <xs:attribute name="class" type="xs:string"/>
+        <xs:attribute name="find-mode" type="findMode"/>
+        <xs:attribute name="id" type="xs:string"/>
+        <xs:attribute name="input" type="xs:string"/>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="tag" type="xs:string" use="required"/>
+        <xs:attribute name="node-value" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="httpGetterProcess">
+    <xs:complexContent>
+      <xs:extension base="process">
+        <xs:sequence/>
+        <xs:attribute name="throw-exception" type="xs:boolean" use="required"/>
+        <xs:attribute name="url" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="loggerProcess">
+    <xs:complexContent>
+      <xs:extension base="process">
+        <xs:sequence/>
+        <xs:attribute name="message" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="stringMatcherProcess">
+    <xs:complexContent>
+      <xs:extension base="process">
+        <xs:sequence/>
+        <xs:attribute name="contextName" type="xs:string"/>
+        <xs:attribute name="find-name" type="findMode"/>
+        <xs:attribute name="input" type="xs:string"/>
+        <xs:attribute name="replace-payload" type="xs:boolean" use="required"/>
+        <xs:attribute name="search" type="xs:string"/>
+        <xs:attribute name="search-group" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="imageProcess">
+    <xs:complexContent>
+      <xs:extension base="process">
+        <xs:sequence/>
+        <xs:attribute name="location" type="xs:string"/>
+        <xs:attribute name="retries-on-fail" type="xs:int" use="required"/>
+        <xs:attribute name="save-to" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="findMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="FIRST"/>
+      <xs:enumeration value="ALL"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

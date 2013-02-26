@@ -1,0 +1,129 @@
+Tools necesary for the job:
+ - General context. Keep reference of the variables that all the filters are gattering so you can specify to them later.
+ - Resource Queue. This queue is the one in charge of getting all the resources that the filters are finding.
+ - Filters. A filter is a process that iterate through a resource (Url, HTML) that is configurated to search a pattern. Support variables to personalize the filter. The state of the filter is stored in the general context.
+ 	* UrlFilter - The url filter calls url's with a configuration of "http://www.someurl.com/{varname1}/images/{varname2}"
+ 	* HtmlFilter - The response of an url filter can be used by a HtmlFilter to inspect the HTML and find objects.
+ 		* HtmlFilterSearch - This is a composite object that can be wrapped inside another HtmlFilterSearch. This is used to iterate inside the Html (in the HtmlFilter). The subsequent html-filter-search will iterate in the subset that the first search made it.
+ 		Ex.
+ 			1_ create a HtmlFilterSearch that finds all the nodes with a property x
+ 			2_ create a HtmlFilterSearch that finds a node img with a property x
+
+ 		This search will iterate until all the searchs are successfully maded, or no one is satisfied.
+ - Resources. The resources are the final objective of the filters. A filter can create a resource as it was a filter in the last position.
+ 	* ImageResource - a resource of type image/jpg|png|jpeg|gif specified as an URL and a save pattern. The save pattern can include folders and file name that uses the General context attributes. This will check the content-length with the final file to validate the downloaded was successful, or it will retry a defined number of times (2 by default)
+
+
+
+An example that im getting in my head is:
+<resource-queue threads="2" />
+BEGIN DEPECATED
+<process>
+	<url-filter id="url-01" url="http://www.mcanime.com/manga/name/{somevariable}">
+		<property context-name="somevariable" value-from="1" value-to="3" />
+	</url-filter>
+	<html-filter id="html-01" find-mode="all|first">
+		<html-filter-search-node id="1" search="<div.*class=pepe" />
+		<html-filter-search-node id="2" search="<img.*class=arulo" />
+	</html-filter>
+	<image-resource url="#{payload}" file-name="folder-{url-01}/manga-name-{html-01.2}" retries="" />
+</process>
+END DEPRECATED
+
+<task>
+	<process-list>
+		<general-context-var name="manga" value="MANGA-NAME" />
+		<http-getter url="mcanima.com/{MANGA-NAME}/44444/1" />
+		<string-matcher search="<select name=&quot;chapter&quot;>" />
+		<iterator context-name="CAPITULO" value-from="1" value-to="3" />
+	<process-list>
+</task>
+
+****************
+  XSD
+****************
+	<task>
+		Una tarea es un conjunto de procesos que serán ejecutados según el orden de declaración (de arriba hacia abajo).
+		Algunos procesos funcionan como iteradores, lo que hacen es ejecutar n veces los procesos que se encuentren luego. Generalmente lo que cambia en cada llamada es el valor de alguna variable dentro del General Context
+
+	<general-context-var name="type:STRING" value="type:OBJECT" />
+		Añade una variable al General Context para ser utilizada por el proceso (puede estár en cualquier parte del proceso)
+		Nota: El payload recibido es reenviado al siguiente proceso sin modificaciones.
+		@ name El nombre de la variable a guardar en el General Context
+		@ value El valor de la variable
+
+	<iterator context-name="type:STRING" value-from="type:INT" value-to="type:INT" />
+		Realiza una iteración a partir de este punto del proceso hacia abajo desde y hasta el rango de valores especificados. Esa variable queda registrada en el General Context
+		Nota: El payload recibido es reenviado al siguiente proceso sin modificaciones.
+		@ context-name El nombre de la variable a guardar en el General Context
+		@ value-from El valor desde el cual iterará. Este valor es inclusive
+		@ value-to El valor hasta el cual iterará. El valor es inclusive
+
+	<http-getter url="type:STRING" throw-exception="[true] | false" />
+		Trae una URL dando como payload el content de la página.
+		@ url #Optional. #SGCV. la url a donde apuntar. Puede contener variables del General Context. Default: {payload}
+		@ throw-exception indica si en el caso de que la página retorne un código distinto de 200 lanza una excepción o no. Por defecto está a true
+
+	<http-filter input="type:STRING" tag="type:STRING" class="type:STRING" name="type:STRING" id="type:STRING" node-value="type:STRING" find-mode="[FIRST] | ALL"/>
+		Permite filtrar del resultado de un http-getter un subconjunto de nodos para que las restantes búsquedas sean mas simples y no den valores indeseados
+		@ input #Optional. #Default payload. El contenido sobre el cual se ejecutará la búsqueda. Este debe tener un formato DOM válido
+		@ tag #Required. El nombre del tag a buscar. Optional. Si no se especifica no busca por este valor.
+		@ class #Optional. #SGCV. El nombre de la property class a buscar. Optional. Si no se especifica no busca por este valor.
+		@ name #Optional. #SGCV. El nombre de la property nombre a buscar. Optional. Si no se especifica no busca por este valor.
+		@ id #Optional. #SGCV. El nombre de la property id a buscar. Optional. Si no se especifica no busca por este valor.
+		@ node-value #Optional. #SGCV. El valor del nodo a buscar. Optional. Si no se especifica no busca por este valor.
+		@ find-mode #Optional. #Default first. Indica si solo debe buscar el primer resultado que concuerde, o debe comportarse como un iterator con todos los valores que haya.
+
+	<string-matcher input="type:STRING" search="type:STRING_REGEX" search-group="type:INT" context-name="type:STRING" find-mode="[FIRST] | ALL" replace-payload="[false] | true"/>
+		Permite realizar una búsqueda de tipo expresión regular
+		Nota: si no hay ningún valor que entre en la ejecución simplemente no se ejecutá el resto de los procesos por debajo
+		@ input #Optional. #Default payload. El contenido sobre el cual se ejecuta la expresión regular. Default: {payload}
+		@ search #Required. La expresión regular a ejecutar
+		@ search-group #Optional. #Default 0 When you use a RegEx as search, you can extract a group inside the match. Ex. Ca([sz])a encuentra Casa y Caza. Si dejas search-group sin nada el resultado sera "Casa o Caza", si lo dejas a 1 el resultado será "s o z"
+		@ context-name #Optional. Si esta variable se encuentra especificada, el resultado de la búsqueda es automáticamente almacenado en el General Context bajo este nombre
+		@ find-mode #Optional. #Default first. Indica si solo debe buscar el primer resultado que concuerde, o debe comportarse como un iterator con todos los valores que haya.
+		@ replace-payload #Optional. #Default false. Indica si se debe reemplazar el payload con el resultado de la búsqueda.
+
+	<logger message="type:STRING" />
+		Permite loggear un mensaje o el payload actual.
+		@ message #Optional. #SGCV. #Default payload. If no message is provided it will log the payload. The message supports General Context vars
+
+	<image location="type:STRING" save-to="type:STRING" retries-on-fail="type:INT" />
+		Permite obtener un recurso de tipo imagen (image/jpe image/jpeg image/png image/gif)
+		@ location De donde se obtendrá el recurso. Default: {payload}
+		@ save-to Donde se guardará el archivo y con que nombre. Todo lo que se encuentre después de la última / se utilizará como nombre de archivo, el resto se interpreta como directorio. Ninguno de los caracteres / o \ son válidos como directorio. No se debe incluir la extensión de archivo, esta se añade automáticamente con la misma de donde fue obtenido.
+		@ retries-on-fail Indica si en caso de que la imagen no se pueda obtener o se haya traido mal se reintenta la descarga de la imagen. Default: 3 (la descarga y dos reintentos más antes de fallar)
+
+
+Notas:
+ 	<http> si no se especifica url toma como valor el payload del proceso anterior
+ 	<html> se elimina el concepto de nodos. Si deseas navegar por nodos crea varios html-filter. Cuando se especifica find-mode="all" funciona como un iterator
+ 	<string> permite filtrar el valor del payload del proceso anterior
+ 	<iterator> permite iterar de un número X a un número Y (genera un for dentro del código con los procesos que vienen debajo de el).
+
+ 	{payload} El nombre de variable payload no está disponible en el general context dado que esta lo que hace es 
+
+To acomplish this XML mapping we are going to use JAXB with the annotation model.
+To handle the request and responses we are going to use Jersey.
+
+
+Caso McAnime:
+ 0 - Agregar una variable al General Context que sea el nombre del manga para que se utilice luego por el Image Resource para el nombre de carpeta y archivo
+ 1 - Partir de una URL base que es la URL donde se lee el manga
+ 2 - Filtro HTML que navegue por los capítulos buscando <select name="chapter">
+ 3 - Iterador de un número X que va de A a B
+ 4 - Filtro HTML que busque en el resultado de 2 un \<option[^\>]*\>{número X}
+ 5 - Filtro que extraiga el valor dentro de option value="([/d]+)
+ 6 - Url getter que traiga una URL a partir del valor obtenido en 5 http://www.mcanime.net/manga_enlinea/naruto/backbeard/{valor-obtenido-en-5}/1
+ 7 - Filtro HTML que navegue por el capítulo buscando <select name="page">
+ 8 - Filtro HTML que busque todos los value="([^"]+)" (ITERATOR)
+ 9 - Url getter que traiga una URL a partir del valor obtenido en 5 y 8 http://www.mcanime.net/manga_enlinea/naruto/backbeard/{valor-obtenido-en-5}/{valor-obtenido-en-8}
+10 - Filtro HTML que navegue buscando la imagen del capítulo 
+		<div class="current_page">
+		<img src="([^"]+)""
+11 - Image Resource que obtenga la imagen con la url del valor obtenido en 5 y la guarde en /{nombre-manga}/{valor-obtenido-en-5}/{nombre-manga}-{valor-obtenido-en-5}-{valor-obtenido-en-8}
+
+Detalles: 
+ - El proceso se ejecuta en single thread por el hecho de que el General Context es un objeto global. Podría hacerse que cada vez que el contexto se copie y se envíe cada vez que hay una iteración, así como que el proceso pase a un pool de threads, pero esto elevaría la complejidad del sistema enormemente, y no es la intención actual.
+ - Cada vez que el sistema encuentre en un parámetro de entrada un {} intentará reemplazar el nombre contenido por una variable del General Context. Si no existe dicho nombre lanzará una General Context exception.
+

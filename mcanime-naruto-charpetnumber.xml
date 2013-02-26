@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<task numberofthreads="5">
+    <process-list>
+        <general-context-var value="http://www.mcanime.net" name="domain"/>
+        <general-context-var value="http://www.mcanime.net/manga_enlinea/naruto/backbeard/345559/18" name="input-url"/>
+        <general-context-var value="naruto" name="manga"/>
+        <general-context-var value="610" name="chapter-from"/>
+        <general-context-var value="610" name="chapter-to"/>
+        <http-getter url="{input-url}" throw-exception="false"/>
+        <http-filter tag="select" name="chapter" find-mode="FIRST"/>
+        <string-matcher search-group="1" search="change_chapter\('([^']+)'" replace-payload="false" replace-context-vars-input="false" find-name="FIRST" contextName="base-url"/>
+        <iterator value-to="{chapter-to}" value-from="{chapter-from}" context-name="chapter"/>
+        <http-filter node-value="{chapter}" tag="option" find-mode="FIRST"/>
+        <string-matcher search-group="1" search="value=&quot;([\d]+)" replace-payload="false" replace-context-vars-input="false" find-name="FIRST" contextName="chapter-id"/>
+        <http-getter url="{domain}{base-url}{chapter-id}/1" throw-exception="false"/>
+        <http-filter tag="Select" name="page" find-mode="ALL"/>
+        <string-matcher search-group="1" search="value=&quot;([\d]+)&quot;" replace-payload="false" replace-context-vars-input="false" find-name="ALL" contextName="page"/>
+        <http-getter url="{domain}{base-url}{chapter-id}/{page}" throw-exception="false"/>
+        <http-filter tag="div" class="current_page"/>
+        <http-filter tag="img"/>
+        <string-matcher search-group="1" search="src=&quot;([^&quot;]+)" replace-payload="true" replace-context-vars-input="false" find-name="FIRST"/>
+        <string-matcher search-group="1" search="\.([\w]+)$" replace-payload="false" replace-context-vars-input="false" find-name="FIRST" contextName="img-extension"/>
+        <image save-to="target/{manga}/{chapter}/{manga}-{chapter}-{page}.{img-extension}" retries-on-fail="3" location="{payload}"/>
+    </process-list>
+</task>
