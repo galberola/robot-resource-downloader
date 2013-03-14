@@ -55,8 +55,8 @@ public class ImageProcess extends Process {
 	public void execute(Payload payload) throws ProcessException {
 		String location = (this.location == null) ? payload.getValue() : this.location;
 		
-		location = getGeneralContext().replaceSpecialCharactersInString(location, payload);
-		String saveTo = getGeneralContext().replaceSpecialCharactersInString(this.saveTo, payload);
+		location = getGeneralContext().replaceExpressionsInString(location, payload);
+		String saveTo = getGeneralContext().replaceExpressionsInString(this.saveTo, payload);
 		
 		logger.info(String.format("Identified image %-30s from %s", saveTo, location));
 		

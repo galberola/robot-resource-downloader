@@ -110,7 +110,7 @@ public class StringMatcherProcess extends Process {
 		String input = (this.input == null) ? payload.getValue() : this.input;
 		
 		if (replaceContextVarsInput)
-			input = getGeneralContext().replaceSpecialCharactersInString(input, payload);
+			input = getGeneralContext().replaceExpressionsInString(input, payload);
 		
 		Matcher matcher = null;
 		

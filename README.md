@@ -1,4 +1,4 @@
-robot-resource-downloader
+Robot Resource Downloader
 =========================
 
 This program is a Robot for downloading resources in the web. It can be configurated from an XML or in Java code.

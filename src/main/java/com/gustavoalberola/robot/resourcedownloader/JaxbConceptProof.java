@@ -285,7 +285,7 @@ public class JaxbConceptProof {
 		gc.setValue("var2", "imvar2");
 		
 		String s = "www.mysite.com/{var1}/someother/{var2}/{payload}.png";
-		s = gc.replaceSpecialCharactersInString(s, p);
+		s = gc.replaceExpressionsInString(s, p);
 		System.out.println(s);
 	}
 	

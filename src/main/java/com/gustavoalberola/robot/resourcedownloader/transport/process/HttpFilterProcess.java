@@ -192,7 +192,7 @@ public class HttpFilterProcess extends Process {
 		String tmp = child.getNodeValue();
 		
 		// And finally check if the match is inside the attribute
-		if (tmp.indexOf(getGeneralContext().replaceSpecialCharactersInString(match, payload)) < 0)
+		if (tmp.indexOf(getGeneralContext().replaceExpressionsInString(match, payload)) < 0)
 			return false;
 		
 		return true;
@@ -210,7 +210,7 @@ public class HttpFilterProcess extends Process {
 		String tmp = e.getAttribute(attributeName);
 		
 		// And finally check if the match is inside the attribute
-		if (tmp.indexOf(getGeneralContext().replaceSpecialCharactersInString(match, payload)) < 0)
+		if (tmp.indexOf(getGeneralContext().replaceExpressionsInString(match, payload)) < 0)
 			return false;
 		
 		return true;

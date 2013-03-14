@@ -32,7 +32,7 @@ public class LoggerProcess extends Process {
 		if (message == null) {
 			System.out.println("Logger payload:" + payload.getValue());
 		} else {
-			String m = getGeneralContext().replaceSpecialCharactersInString(message, payload);
+			String m = getGeneralContext().replaceExpressionsInString(message, payload);
 			System.out.println("Logger:" + m);
 		}
 		

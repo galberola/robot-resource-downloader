@@ -49,8 +49,8 @@ public class IteratorProcess extends Process {
 			int valueTo = 0;
 			
 			try {
-				valueFrom = Integer.valueOf(getGeneralContext().replaceSpecialCharactersInString(this.valueFrom, payload));
-				valueTo = Integer.valueOf(getGeneralContext().replaceSpecialCharactersInString(this.valueTo, payload));
+				valueFrom = Integer.valueOf(getGeneralContext().replaceExpressionsInString(this.valueFrom, payload));
+				valueTo = Integer.valueOf(getGeneralContext().replaceExpressionsInString(this.valueTo, payload));
 			} catch (NumberFormatException e) {
 				throw new ProcessException("Iterator cannot take valueFrom or valueTo as Integer", e);
 			}

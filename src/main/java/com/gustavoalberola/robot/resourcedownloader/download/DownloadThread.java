@@ -87,13 +87,11 @@ public class DownloadThread implements Runnable {
 		logger.info(name + " downloading " + r.getSourceUrl().toString() + " to " + copyTo.toString());
 		
 		int contentLength = 0;
-		String contentType = null;
 		ClientResponse cr = null;
 		
 		try {
 			cr = wr.head();
 			contentLength = cr.getLength();
-			contentType = cr.getType().toString();
 		} catch (ClientHandlerException e) {
 			throw new ProcessException("Cannot get the header of the file", e);
 		}

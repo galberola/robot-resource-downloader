@@ -22,19 +22,16 @@ public class ResourceManagerImpl implements ResourceManager {
 		threads = new LinkedList<Thread>();
 	}
 	
-	@Override
 	public void setNumberOfThreads(int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
 	}
 	
-	@Override
 	public void addResourceToQueue(Resource resource) {
 		synchronized (queueLock) {
 			queue.add(resource);
 		}
 	}
 
-	@Override
 	public void startQueue() {
 		queueRunning = true;		
 		Thread t = null;
@@ -48,17 +45,14 @@ public class ResourceManagerImpl implements ResourceManager {
 		}
 	}
 
-	@Override
 	public void endQueue() {
 		queueRunning = false;
 	}
 	
-	@Override
 	public boolean isQueueEnded() {
 		return !queueRunning;
 	}
 
-	@Override
 	public Resource getNextResourceInQueue() {
 		Resource resInQueue = null;
 		synchronized (queueLock) {

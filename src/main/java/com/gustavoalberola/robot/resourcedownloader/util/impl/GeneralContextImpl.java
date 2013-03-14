@@ -14,6 +14,13 @@ import com.gustavoalberola.robot.resourcedownloader.exception.TryingToUseReserve
 import com.gustavoalberola.robot.resourcedownloader.model.Payload;
 import com.gustavoalberola.robot.resourcedownloader.util.GeneralContext;
 
+/**
+ * Implementation of the context. Uses a hashMap to store variables, so no more than one value for a Key.
+ * <p>
+ * <b>Note</b>: payload is a reserved word (it cannot be used as key)
+ * 
+ * @author gustavoalberola
+ */
 public class GeneralContextImpl implements GeneralContext {
 
 	static private final Log logger = LogFactory.getLog(GeneralContextImpl.class);
@@ -28,31 +35,31 @@ public class GeneralContextImpl implements GeneralContext {
 		contextVars = new HashMap<String, Object>();
 	}
 
-	public void setValue(String name, Object value) throws EmptyGeneralContextVariableNameException, TryingToUseReservedNameInGeneralContextException {
-		checkIfNameIsEmpty(name);
-		name = name.toLowerCase();
-		checkIfNameIsReservedWord(name);
+	public void setValue(String key, Object value) throws EmptyGeneralContextVariableNameException, TryingToUseReservedNameInGeneralContextException {
+		checkIfKeyIsEmpty(key);
+		key = key.toLowerCase();
+		checkIfKeyIsReservedWord(key);
 		
-		contextVars.put(name, value);
-		logger.info(String.format("Added/Updated Context var \"%s\":\"%s\"", name, value));	
+		contextVars.put(key, value);
+		logger.info(String.format("Added/Updated Context var \"%s\":\"%s\"", key, value));	
 	}
 
-	public Object getValue(String name) throws EmptyGeneralContextVariableNameException, TryingToUseReservedNameInGeneralContextException {
-		checkIfNameIsEmpty(name);
-		name = name.toLowerCase();
-		checkIfNameIsReservedWord(name);		
+	public Object getValue(String key) throws EmptyGeneralContextVariableNameException, TryingToUseReservedNameInGeneralContextException {
+		checkIfKeyIsEmpty(key);
+		key = key.toLowerCase();
+		checkIfKeyIsReservedWord(key);		
 		
-		return contextVars.get(name);
+		return contextVars.get(key);
 	}
 	
-	private void checkIfNameIsEmpty(String name) throws EmptyGeneralContextVariableNameException {
-		if (name == null || name.isEmpty())
+	private void checkIfKeyIsEmpty(String key) throws EmptyGeneralContextVariableNameException {
+		if (key == null || key.isEmpty())
 			throw new EmptyGeneralContextVariableNameException();
 	}
 	
-	private void checkIfNameIsReservedWord(String word) throws TryingToUseReservedNameInGeneralContextException {
+	private void checkIfKeyIsReservedWord(String key) throws TryingToUseReservedNameInGeneralContextException {
 		for (String rWord : RESERVED_WORDS) {
-			if (rWord.equalsIgnoreCase(word)) 
+			if (rWord.equalsIgnoreCase(key)) 
 				throw new TryingToUseReservedNameInGeneralContextException(rWord);
 		}		
 	}
@@ -65,7 +72,7 @@ public class GeneralContextImpl implements GeneralContext {
 		return false;
 	}
 
-	public String replaceSpecialCharactersInString(String inputString, Payload payload) throws NoSuchGeneralContextVariableException {
+	public String replaceExpressionsInString(String inputString, Payload payload) throws NoSuchGeneralContextVariableException {
 				
 		Matcher m = null;
 		Matcher m2 = null;

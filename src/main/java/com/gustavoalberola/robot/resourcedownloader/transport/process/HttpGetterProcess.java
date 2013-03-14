@@ -54,7 +54,7 @@ public class HttpGetterProcess extends Process {
 		// Use the this.url if it is not null or the payload as the URL 
 		// but first replace the special characters that might be in it
 		String url = (this.url == null) ? payload.getValue() : this.url;		
-		url = getGeneralContext().replaceSpecialCharactersInString(url, payload);
+		url = getGeneralContext().replaceExpressionsInString(url, payload);
 		
 		URI uri = UriBuilder.fromPath(url).build();		
 		
