@@ -131,6 +131,7 @@ public class HttpFilterProcess extends Process {
 		// Filter the nodes by tag name
 		NodeList l1 = doc.getElementsByTagName(tag);
 		
+		boolean match = false;
 		// Iterate through the Elements that match the tag
 		for (int a = 0, aMax = l1.getLength() ; a < aMax ; a++) {
 			Node n1 = l1.item(a);
@@ -139,6 +140,7 @@ public class HttpFilterProcess extends Process {
 				// Check if the node match the requirements specified by the class
 				if (matchRequirements(e1)) {
 					
+					match = true;
 					logger.info(String.format("Finded match for filter Tag:%s - name:%s - class:%s - id:%s - value:%s", tag, name, clazz, id, value));
 					if (isNextProcessToCall()) {						
 						Payload newPayload = new Payload(nodeToString(n1));
@@ -151,6 +153,9 @@ public class HttpFilterProcess extends Process {
 			}
 		}
 		
+		if (!match) {
+			logger.error(String.format("No match for filter Tag:%s - name:%s - class:%s - id:%s - value:%s", tag, name, clazz, id, value));
+		}
 	}
 	
 	private static String nodeToString(Node node) throws ProcessException {

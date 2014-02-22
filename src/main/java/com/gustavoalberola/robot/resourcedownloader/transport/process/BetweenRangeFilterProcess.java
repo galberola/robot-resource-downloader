@@ -45,14 +45,14 @@ public class BetweenRangeFilterProcess extends Process {
 	public void execute(Payload payload) throws ProcessException {
 
 		if (isNextProcessToCall()) {
-			int from = 0;
-			int to = 0;
-			int value = 0;
+			float from = 0;
+			float to = 0;
+			float value = 0;
 
 			try {
-				from = Integer.valueOf(getGeneralContext().replaceExpressionsInString(this.from, payload));
-				to = Integer.valueOf(getGeneralContext().replaceExpressionsInString(this.to, payload));
-				value = Integer.valueOf(getGeneralContext().replaceExpressionsInString(this.value, payload));
+				from = Float.valueOf(getGeneralContext().replaceExpressionsInString(this.from, payload));
+				to = Float.valueOf(getGeneralContext().replaceExpressionsInString(this.to, payload));
+				value = Float.valueOf(getGeneralContext().replaceExpressionsInString(this.value, payload));
 			} catch (NumberFormatException e) {
 				throw new ProcessException("Iterator cannot take from, to or value as Integer", e);
 			}
